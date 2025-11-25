@@ -19,11 +19,11 @@ exp:
   cse_mesh_name:  'smal' 
   checkpoint_path_shape:   ''
   checkpoint_path_texture: ''
-  category: 'dog'
+  category: 'cat'
 
   # Data -- 
-  dataset_source: 'COP3D'
-  sequence_index: '1030_23106_17099'
+  dataset_source: 'CUSTOM'
+  sequence_index: 'test_seq'
   frame_limit: 200
   train_split: 15
   test_split: 5
@@ -48,9 +48,9 @@ exp:
   #Checkpoint frequency [Eval, model checkpoint]
   checkpoint_freq: 1000
   train_vertice_offset: True 
-  l_optim_tracking: [[300], [5e-4, 5e-2]]
-  l_optim_part_kp: [[300], [5e-5, 5e-8]]
-  l_optim_part_chamfer: 5
+  l_optim_tracking: 0
+  l_optim_part_kp: 0
+  l_optim_part_chamfer: 0
   
   # Shape optim model --
   init_shape: False

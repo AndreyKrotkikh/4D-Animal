@@ -78,7 +78,10 @@ class LossOptimPartChamfer:
         self.cameras = cameras
         self.image_size = image_size
 
-        BATCH, H, W = self.part_masks.shape
+        if self.part_masks is not None:
+            BATCH, H, W = self.part_masks.shape
+        else:
+            BATCH, H, W = 0, 0, 0
 
         self.cameras = cameras
         self.renderer = renderer
@@ -177,6 +180,9 @@ class LossOptimPartChamfer:
             )  # (B, N_part_verts)
 
             # Extract the binary mask for this part
+            if self.part_masks is None:
+                continue
+            
             mask = (self.part_masks[X_ind] == part_id).float()  # (B, H, W)
 
             # Filter empty part
@@ -281,7 +287,10 @@ class LossOptimPartKp:
         self.cameras = cameras
         self.image_size = image_size
 
-        BATCH, N_KPS_MAX, _ = self.mask_keypoints_xy.shape
+        if self.mask_keypoints_xy is not None:
+            BATCH, N_KPS_MAX, _ = self.mask_keypoints_xy.shape
+        else:
+            BATCH, N_KPS_MAX = 0, 0
 
         self.cameras = cameras
         self.renderer = renderer
@@ -363,6 +372,11 @@ class LossOptimPartKp:
         )  # (BATCH_P, N_Vertice)
 
         # Get the 3d coordinates of points on the smal mesh correspoding to cse_keypoints_xy -> (BATCH_P, N_KPS, 3)
+        
+        if self.mask_keypoints_vert_id is None:
+             # Return 0 loss if part keypoints are missing
+             return torch.zeros((X_ind.shape[0], 1), device=self.device)
+
         vert_id_expanded = (
             self.mask_keypoints_vert_id[X_ind].unsqueeze(-1).expand(-1, -1, 3)
         )

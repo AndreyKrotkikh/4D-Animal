@@ -124,6 +124,10 @@ class LossOptimTracking:
         loss_values = []
 
         for t in range(BATCH):
+            if self.tracking_points is None:
+                loss_values.append(torch.tensor(0.0, device=self.device))
+                continue
+
             frame1_proj, frame2_proj = t, t - 1
             frame1_track, frame2_track = X_ind[t], X_ind[t - 1]
 

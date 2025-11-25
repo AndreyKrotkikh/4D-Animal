@@ -14,6 +14,8 @@ import torch
 import pickle as pk
 import os
 import json
+import time
+import urllib.error
 from PIL import Image
 import numpy as np
 from tqdm import tqdm
@@ -444,7 +446,24 @@ class COPSingleVideo(Dataset):
             ]
         )
 
-        dino = torch.hub.load("facebookresearch/dino:main", "dino_vits8")
+        dino = None
+        max_retries = 10
+        for attempt in range(max_retries):
+            try:
+                dino = torch.hub.load("facebookresearch/dino:main", "dino_vits8")
+                break
+            except (urllib.error.HTTPError, RuntimeError, OSError) as e:
+                if attempt == max_retries - 1:
+                    raise e
+                print(f"Error downloading/loading DINO model (attempt {attempt+1}/{max_retries}): {e}. Retrying in 5 seconds...")
+                time.sleep(5)
+            except Exception as e:
+                 # Catch generic exceptions that might occur during download/load
+                if attempt == max_retries - 1:
+                    raise e
+                print(f"Unexpected error loading DINO model (attempt {attempt+1}/{max_retries}): {e}. Retrying in 5 seconds...")
+                time.sleep(5)
+
         dino.eval().to(device)
 
         dino_feature_list = []

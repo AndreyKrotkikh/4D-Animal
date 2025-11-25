@@ -140,8 +140,9 @@ def main_train(cfg):
     if cfg.exp.l_optim_tracking != 0:
         print("Use tracking keypoints")
         tracking_points, tracking_visibles = ic.tracking_points
-        tracking_points = tracking_points.to(device)
-        tracking_visibles = tracking_visibles.to(device)
+        if tracking_points is not None:
+            tracking_points = tracking_points.to(device)
+            tracking_visibles = tracking_visibles.to(device)
     else:
         tracking_points, tracking_visibles = None, None
 
@@ -170,14 +171,19 @@ def main_train(cfg):
     if cfg.exp.l_optim_part_kp != 0:
         print("Use part keypoints")
         mask_keypoints_xy, mask_keypoints_vert_id = ic.part_keypoints
-        mask_keypoints_xy = mask_keypoints_xy.to(device)
-        mask_keypoints_vert_id = mask_keypoints_vert_id.to(device)
-        part_masks = ic.part_masks.to(device)
-        print(
-            "Mask keypoint", mask_keypoints_vert_id.shape, mask_keypoints_xy.shape
-        )  # torch.Size([202, 1754]) torch.Size([202, 1754, 2])
+        if mask_keypoints_xy is not None:
+            mask_keypoints_xy = mask_keypoints_xy.to(device)
+            mask_keypoints_vert_id = mask_keypoints_vert_id.to(device)
+            part_masks = ic.part_masks.to(device)
+            print(
+                "Mask keypoint", mask_keypoints_vert_id.shape, mask_keypoints_xy.shape
+            )  # torch.Size([202, 1754]) torch.Size([202, 1754, 2])
+        else:
+            mask_keypoints_xy, mask_keypoints_vert_id = None, None
+            part_masks = None
     else:
         mask_keypoints_xy, mask_keypoints_vert_id = None, None
+        part_masks = None
 
     # Sparse keypoints
     if cfg.exp.l_optim_sparse_kp > 0:

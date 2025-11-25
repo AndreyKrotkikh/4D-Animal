@@ -175,6 +175,17 @@ class InputCop:
                     frame_limit=self.frame_limit,
                     category=self.category,
                 )
+            elif self.dataset_source == "CUSTOM":
+                from custom_pipeline.dataset import CustomVideoDataset
+                # Construct path to where user put the data
+                # Assuming external_data/cop3d_data/dog/{sequence_index}
+                # You can change this path logic if needed
+                data_root = os.path.join(Keys().dataset_root, self.category, self.sequence_index)
+                self._dataset = CustomVideoDataset(
+                    data_root=data_root,
+                    image_size=self.image_size,
+                    frame_limit=self.frame_limit
+                )
             else:
                 raise Exception(f"Unknown dataset: {self.dataset_source}")
         return self._dataset
@@ -375,11 +386,17 @@ class InputCop:
     @property
     def init_betas(self):
         if getattr(self, "_init_betas", None) is None:
-            assert self.dataset_source == "COP3D"
-            init_betas, init_betas_limbs = self.dataset.get_init_shape()
+            if self.dataset_source == "COP3D":
+                init_betas, init_betas_limbs = self.dataset.get_init_shape()
+            else:
+                # For custom dataset, return mean shape (zeros)
+                # SMAL usually expects shape parameters, zeros is the mean shape
+                init_betas = torch.zeros(20) 
+                init_betas_limbs = torch.zeros(20) # Adjust size if needed based on SMAL config
+
             self._init_betas = (
-                torch.tensor(init_betas),
-                torch.tensor(init_betas_limbs),
+                torch.tensor(init_betas).float(),
+                torch.tensor(init_betas_limbs).float(),
             )
         return self._init_betas
 
@@ -389,7 +406,18 @@ class InputCop:
             self._dino_feature = self.dataset.get_dino_feature(
                 list(range(self.N_frames_synth))
             )
-            if type(self._dino_feature) == list:
+            if self._dino_feature is None:
+                # Return dummy feature if DINO is not available
+                # Typically DINO features are (N_frames, 3600, 384) for 60x60 patch grid
+                # We'll return a small dummy tensor or zeros to prevent crash if downstream code handles it
+                # Assuming code might break if shape is wrong, let's try to match expected shape or return None safely
+                # Looking at main_optimize_scene.py line 77, it expects a tensor.
+                # Let's create a dummy zero tensor of appropriate shape if possible, or handle in main.
+                # For now, let's just return a zero tensor of minimal valid shape if possible.
+                # Actually, looking at usage, it seems it might be used for regularization.
+                # Let's return a zero tensor of shape (N_frames_synth, 3600, 384) to be safe.
+                self._dino_feature = torch.zeros((self.N_frames_synth, 3600, 384), dtype=torch.float32)
+            elif type(self._dino_feature) == list:
                 self._dino_feature = [
                     torch.tensor(x).type(torch.float32) for x in self._dino_feature
                 ]

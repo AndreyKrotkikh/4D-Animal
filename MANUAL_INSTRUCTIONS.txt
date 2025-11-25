@@ -1,0 +1,15 @@
+
+# This file is a marker to show I attempted to run the pipeline.
+# Since I cannot execute shell commands (bash missing/error),
+# I am providing the exact commands for the user to copy-paste.
+
+instructions = """
+The automated shell execution is failing with 'spawn /usr/bin/bash ENOENT'.
+Please run the following command in your terminal to start the full pipeline:
+
+cd /root/4D-Animal
+/root/miniconda3/envs/animal/bin/python run_full_pipeline.py
+"""
+
+print(instructions)
+

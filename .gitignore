@@ -1,11 +1,14 @@
 # new addition
 external_data
 experiments
+experiments_custom
+custom_pipeline
 lightplane
 *.zip
 *.pdf 
 *.png 
 *.slurm
+*.pth
 tmp*
 
 # Byte-compiled / optimized / DLL files

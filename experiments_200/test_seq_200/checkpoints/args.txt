@@ -1,0 +1,109 @@
+training:
+  tag: ''
+  device: cuda
+exp:
+  name: null
+  experiment_folder: experiments_200
+  cse_mesh_name: smal
+  checkpoint_path_shape: ''
+  checkpoint_path_texture: ''
+  category: cat
+  dataset_source: CUSTOM
+  sequence_index: test_seq_200
+  frame_limit: 200
+  train_split: 15
+  test_split: 5
+  clip_grad: true
+  warm_rate: 0.1
+  n_steps: 10000
+  n_shape_steps: 10000
+  batch_size: 32
+  image_size: 256
+  moving_camera: true
+  lr_vertices_off:
+  - 5.0e-05
+  - - 3000
+    - 5000
+    - 9000
+  - - 0
+    - 0.5
+    - 1
+    - 1.5
+  lr_pose: 0.0005
+  lr_betas: 0.0005
+  lr_texture: 0.1
+  factor_pose: 0.4
+  milestones_pose:
+  - 9000
+  - 9500
+  factor_texture: 0.5
+  milestones_texture:
+  - 9000
+  - 9500
+  checkpoint_freq: 1000
+  train_vertice_offset: true
+  l_optim_tracking: 0
+  l_optim_part_kp: 0
+  l_optim_part_chamfer: 0
+  init_shape: false
+  mlp_model:
+    _target_: model.pose_models.model_mlp.PoseMLP
+    mlp_n_layers: 1
+    mlp_hidd_dim: 64
+    mlp_activation: leaky_relu
+    pos_embedding_dim: 8
+    pos_embedding_mode: power_nls
+  texture_mlp_model:
+    _target_: model.texture_models.model_duplex.TextureDuplex
+    n_layers_trunk: 3
+    n_layers_opacity: 1
+    n_layers_color: 1
+    num_samples: 64
+    num_channels: 32
+    vol_size: 64
+    scale: 0.03
+    encode_direction: false
+    gain: 1.0
+    opacity_init_bias: -5.0
+    inject_noise_sigma: 0.0
+    rays_jitter_near_far: false
+  l_parameter: 0.01
+  l_optim_chamfer:
+  - - 300
+    - 1000
+    - 6000
+  - - 1
+    - 100
+    - 500
+    - 800
+  l_optim_cse_kp:
+  - - 1000
+    - 6000
+  - - 5
+    - 0.1
+    - 0.01
+  l_optim_color: 10.0
+  l_optim_sparse_kp: 0.0
+  l_arap_reg:
+  - - 9950
+  - - 1
+    - 5
+  l_arap_fast_reg:
+  - - 9950
+  - - 0.01
+    - 0.05
+  l_laplacian_reg:
+  - - 9950
+  - - 10
+    - 100
+  l_tv_reg: 0
+  N_cse_kp: 1000
+  cse_version: original
+  filter_cse_kps: true
+  l_chamfer_config:
+    N_pts_sampled: 10000
+    resample_freq: 1000
+    weight_invisible: 0.05
+  l_color_config:
+    n_rays_per_image: -1
+    resolution_loss: 256

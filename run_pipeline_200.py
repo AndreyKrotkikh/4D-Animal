@@ -45,6 +45,12 @@ def main():
     
     # Wait, I need to edit preprocess_sam.py to accept max_frames from argv[4] if provided.
     
+    # 1.5 DINO Preprocessing
+    # Input: external_data/cop3d_data/cat/test_seq_200/images
+    # Output: external_data/cop3d_data/cat/test_seq_200/dino_features.pt
+    dino_output_file = f"{output_data_path}/dino_features.pt"
+    cmd_dino = f"{python_exe} custom_pipeline/preprocess_dino.py {output_data_path}/images {dino_output_file}"
+
     # 2. CSE Preprocessing
     # We need a runner script for this that accepts args, or we use the 'run_preprocess_custom.py' and edit it dynamically/pass args.
     # Easier to write a specific small script here or use hydra/argparse in the called script.
@@ -106,8 +112,11 @@ if __name__ == "__main__":
     # I will invoke the sam script but I need to make sure it respects 200.
     
     # B. Run SAM
-    # run_cmd(cmd_sam, "SAM Preprocessing") 
+    run_cmd(cmd_sam, "SAM Preprocessing") 
     # (I'll assume I fix the SAM script in next step)
+
+    # B.5. Run DINO
+    run_cmd(cmd_dino, "DINO Preprocessing")
 
     # C. Run CSE/PnP
     run_cmd(f"{python_exe} run_preprocess_200.py", "CSE & PnP Preprocessing")

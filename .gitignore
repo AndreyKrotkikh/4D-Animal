@@ -182,3 +182,12 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+*.mp4
+*.pk
+*.pt
+*.txt
+
+*.tar.gz
+
+experiments_200/
